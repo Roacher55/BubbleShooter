@@ -20,7 +20,12 @@ public class Bubble : MonoBehaviour
     public static float scaleBlue = 0.5f;
     public static float scalePink = 0.12f;
     public static float scaleCrystal = 0.3f;
-    
+
+    private int collisionCount = 0;
+    bool destroySingleBubble = false;
+
+    public float speedFall = 0.8f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -60,7 +65,7 @@ public class Bubble : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        DestroySingleBubble();
     }
     /*
     void OnCollisionEnter2D(Collision2D col)
@@ -86,10 +91,42 @@ public class Bubble : MonoBehaviour
             Instantiate(dead, this.transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
-        
+
+        if(collision.gameObject.tag == "Bubble")
+        {
+            collisionCount--;
+        }
+
+        if(collision.gameObject.tag != "ColumnBack" && collisionCount==0)
+        {
+            destroySingleBubble = true; ;
+        }
+
     }
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Bubble")
+        {
+            collisionCount++;
+        }
+}
 
+    void DestroySingleBubble()
+    {
+        if(destroySingleBubble == true)
+        {
+            Destroy(GetComponent<Rigidbody2D>());
+            GetComponent<BoxCollider2D>().enabled = false;
+            //gameObject.tag = "Untagged";
+            transform.position = Vector3.MoveTowards(transform.position, new  Vector2(transform.position.x, -3), speedFall);
+        if(transform.position.y <-2)
+        { 
+        Instantiate(dead, this.transform.position, Quaternion.identity);
+        Destroy(this.gameObject);
+            }
+    }
+    }
 
 
 }
